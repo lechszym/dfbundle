@@ -115,6 +115,23 @@ def df_similarity(x,ws,tensordot_datasize_limit=10000):
         S /= N
     return S
 
+def df_von_Neumann_entropy(S):
+   """
+        df_von_Neumann entropy computes the entropy of a square matrix
+
+        :param S: NxN similarity matrix
+        :return: von Neumann entropy of a
+   """
+   lbd = np.linalg.eigvalsh(S)
+   lbd /= np.sum(lbd)
+   lbd = lbd[lbd > 1e-8]
+   if len(lbd) == 1:
+      H = 0
+   else:
+      H = -np.sum(lbd * np.log2(lbd))
+
+   return H
+
 def df_entropy(model,x,verbose=False):
     """
     df_entropy computes the conceptual capacity of a model based on data sample
@@ -143,13 +160,7 @@ def df_entropy(model,x,verbose=False):
         sys.stdout.write("Evaluating the entropy of the similarity matrix...")
         sys.stdout.flush()
 
-    lbd = np.linalg.eigvalsh(S)
-    lbd /= np.sum(lbd)
-    lbd = lbd[lbd > 1e-8]
-    if len(lbd) == 1:
-        H = 0
-    else:
-        H = -np.sum(lbd * np.log2(lbd))
+    H = df_von_Neumann_entropy(S)
 
     if verbose:
         sys.stdout.write("done\n")

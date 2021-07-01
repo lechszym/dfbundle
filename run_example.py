@@ -49,7 +49,7 @@ model.compile(
    metrics=['accuracy']
 )
 
-model.fit(x_train, y_train, epochs=1, batch_size=128,shuffle=True)
+model.fit(x_train, y_train, epochs=20, batch_size=128,shuffle=True)
 
 # Show model performance
 train_accuracy = model.evaluate(x_train,y_train)[model.metrics_names.index('accuracy')]
