@@ -58,11 +58,11 @@ test_accuracy = model.evaluate(x_test,y_test)[model.metrics_names.index('accurac
 print("Train/Test accuracy = %.3f/%.3f" % (train_accuracy,test_accuracy))
 
 
-# Conceptual capacity computation
+# Conceptual complexity computation
 N = 4000 #Number of points to sample from the training set
          #for the computation of conceptual capacity.
 selected_indexes = np.random.permutation(len(x_train))[:N]
 
-Hdf = df_entropy(model,x_train[selected_indexes],verbose=True)
+Hdf = df_ccomplexity(model,x_train[selected_indexes],y_train[selected_indexes],verbose=True)
 
 print("Hdf_%d = %.3f" % (N,Hdf))

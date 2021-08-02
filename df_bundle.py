@@ -132,20 +132,22 @@ def df_von_Neumann_entropy(S):
 
    return H
 
-def df_entropy(model,x,verbose=False):
+def df_ccapacity(model,x,ws=None,verbose=False):
     """
-    df_entropy computes the conceptual capacity of a model based on data sample
+    df_ccapacity computes the conceptual capacity of a model based on data sample
 
     :param model: tensorflow model of M inputs and K outputs
     :param x: set of N inputs for evaluation of conceptual capacity
     :return: conceptual capacity of the model evaluated on x
     """
 
-    if verbose:
-        sys.stdout.write("Computing the df bundle for %d points..." % len(x))
-        sys.stdout.flush()
+    if ws is None:
+        if verbose:
+            sys.stdout.write("Computing the df bundle for %d points..." % len(x))
+            sys.stdout.flush()
 
-    ws = df_bundle(model,x)
+        ws = df_bundle(model,x)
+
 
     if verbose:
         sys.stdout.write("done\n")
@@ -160,11 +162,81 @@ def df_entropy(model,x,verbose=False):
         sys.stdout.write("Evaluating the entropy of the similarity matrix...")
         sys.stdout.flush()
 
-    H = df_von_Neumann_entropy(S)
+    K = df_von_Neumann_entropy(S)
 
     if verbose:
         sys.stdout.write("done\n")
         sys.stdout.flush()
 
-    return H
+    return K
 
+def df_cseparation(model,x,y,ws=None):
+    """
+    df_cseparation computes the conceptual separation of a model based on data sample
+
+    :param model: tensorflow model of M inputs and K outputs
+    :param x: set of N inputs for evaluation of conceptual capacity
+    :param y: set of N labels of x (as digits of single array)
+    :return: conceptual separation of the model evaluated on x
+    """
+
+    if ws is None:
+        ws = df_bundle(model, x)
+
+    class_labels = np.unique(y)
+    CS = 0
+    N = len(x)
+
+    for c in class_labels:
+        I = np.where(y == c)[0]
+        S = df_similarity(x[I], ws[I])
+
+        lbd = np.linalg.eigvalsh(S)
+        lbd /= np.sum(lbd)
+        lbd = lbd[lbd > 1e-8]
+        if len(lbd) > 1:
+            CS -= np.sum(lbd * np.log2(lbd)) * len(I) / N
+
+    return CS
+
+def df_ccomplexity(model,x,y,verbose=False):
+    """
+    df_ccomplexity computes the conceptual complexity of a model based on data sample
+
+    :param model: tensorflow model of M inputs and K outputs
+    :param x: set of N inputs for evaluation of conceptual capacity
+    :param y: set of N labels of x (as digits of single array)
+    :return: conceptual complexity of the model evaluated on x
+    """
+
+    if verbose:
+        sys.stdout.write("Computing the df bundle for %d points..." % len(x))
+        sys.stdout.flush()
+
+    ws = df_bundle(model,x)
+
+    if verbose:
+        sys.stdout.write("done\n")
+        sys.stdout.write("Evaluating conceptual capacity...")
+        sys.stdout.flush()
+
+    K = df_ccapacity(model, x, ws=ws)
+
+    if verbose:
+        sys.stdout.write("done\n")
+
+    if K==0:
+        sys.stdout.write("K=0, conceptual complexity is undefined\n.")
+        sys.stdout.flush()
+        return None
+
+    if verbose:
+        sys.stdout.write("Evaluating conceptual separation...")
+        sys.stdout.flush()
+
+    CS = df_cseparation(model,x,y,ws=ws)
+
+    if verbose:
+        sys.stdout.write("done\n")
+
+    return K/(K-CS)

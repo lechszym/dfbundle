@@ -1,5 +1,4 @@
 import os
-import logging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from df_bundle import *
 import tensorflow as tf
@@ -72,6 +71,6 @@ print("Mean difference between similarity with and without tensordot  = %.3f" % 
 H_with_tensordot = df_von_Neumann_entropy(S_with_tensordot)
 H_without_tensordot = df_von_Neumann_entropy(S_without_tensordot)
 
-print("Hdf with    tensordot  = %.3f" % H_with_tensordot)
-print("Hdf without tensordot  = %.3f" % H_without_tensordot)
+print("Kdf with    tensordot  = %.3f" % H_with_tensordot)
+print("Kdf without tensordot  = %.3f" % H_without_tensordot)
 
