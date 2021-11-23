@@ -1,6 +1,6 @@
 # dfbundle
 
-Conceptual capacity and effective complexity of neural networks by L. Szymanski, B. McCane, C. Atkinson https://arxiv.org/abs/2103.07614.
+Conceptual complexity of neural networks by L. Szymanski, B. McCane, C. Atkinson https://doi.org/10.1016/j.neucom.2021.10.063.
 
 Configure python environment with tensorflow and scikit-image libraries.
 
